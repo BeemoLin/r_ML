@@ -1,0 +1,59 @@
+### 敘述統計是描述資料分佈的特性，可以描述資料的:
+
+ - 集中趨勢(平均數(mean)、中位數(median)、眾數(mode))
+ - 離散趨勢(標準差(sd)、變異數(var)、變異係數(cv)、全距(range)、四分位(Quartile))
+
+
+#### 集中趨勢
+```{r}
+n = c(1, 1, 2, 4, 6)
+plot(n, pch = 4, col = "blue", cex = 2) # pch 形狀 col 顏色 cex 大小
+```
+```{r}
+# 加總
+sum(n)
+
+#平均數 總合除個數 
+mean(n)
+
+#中位數:將資料由小到大，位置居中者，就是中位數  
+median(n)
+
+#眾數:一組資料中，出現最多次數的值 
+as.numeric(names(table(n)))[which.max(table(n))]
+
+
+plot(n, pch = 17, col = "gray", cex = 2)
+
+#畫平均數的點 
+points(mean(n), pch = 4, col = "blue", cex = 3)
+
+#畫中位數的點 
+points(median(n), pch = 3, col = "blue", cex = 3) 
+
+```
+#### 集中趨勢在2-3的值間
+
+
+#### 離散趨勢
+```{r}
+n = (1:10); n
+
+sprintf("標準差 = %s", sd(n))
+sprintf("變異數 = %s; %s", var(n), sd(n)^2)
+sprintf("變異係數 = %s", 100 * sd(n) / mean(n))
+sprintf("全距(最大值減最小值) = %s", range(n)[2] - range(n)[1])
+
+#四分位:把資料切分為四等分，中間的三條線就是四分位，Q1=P25,Q2=P50,Q3=75 
+sprintf("四分位 = %s %s %s", quantile(n, 1 / 4), quantile(n, 2 / 4), quantile(n, 3 / 4))
+
+# IQR = Q3 - Q1
+b = quantile(n, 3 / 4) - quantile(n, 1 / 4); b
+sprintf("IQR = %s", IQR(n))
+
+#總結數據(超好用) 
+sprintf("summary = %s", summary(n))
+#百分位 
+sprintf("quantile = %s", quantile(n))
+```
+

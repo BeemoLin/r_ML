@@ -1,0 +1,70 @@
+```{r}
+#安裝並載入gcookbook 
+install.packages(c("ggplot2", "gcookbook")) 
+library(ggplot2) 
+library(gcookbook) 
+ 
+#製作簡單的資料(女生版1歲前身高曲線97分位) 
+BaybyGowth <- data.frame( 
+month = c(1, 2, 4, 6, 8, 10, 12), 
+height = c(57, 61, 67, 71, 74, 76, 79)) 
+
+print(BaybyGowth)
+ 
+#兒童生長曲線 
+#http://health99.hpa.gov.tw/doc/12024.pdf 
+ 
+#先畫基本線圖 
+ggplot(BaybyGowth, aes(x = month, y = height)) + geom_point()
+```
+
+
+### 加入線段 geom_line()
+```{r}
+ggplot(BaybyGowth, aes(x = month, y = height)) + geom_line() + geom_point()
+```
+
+### 調整y軸範圍
+```{r}
+#(3)加上y軸的上下限 ylim(50, max(BaybyGowth$height))
+ggplot(BaybyGowth, aes(x = month, y = height)) + geom_line() + geom_point() + ylim(50, max(BaybyGowth$height))
+```
+
+### 座標點顏色
+```{r}
+#(4)座標加上顏色(darkred)並且用pink色填滿 
+ggplot(BaybyGowth, aes(x = month, y = height, group = 1)) + geom_line() + 
+geom_point(size = 4, shape = 22, colour = "darkred", fill = "pink") + ylim(50, max(BaybyGowth$height))
+```
+
+### 多條折線
+```{r}
+#載入plyr 
+library(plyr) 
+#總結牙齒成長紀錄(60筆彙總成6筆) 
+tg <- ddply(ToothGrowth, c("supp", "dose"), summarise, length = mean(len)) 
+#檢視整理完成的數據 
+tg
+```
+
+### ggplot
+```{r}
+ggplot(tg, aes(x = dose, y = length, colour = supp)) +
+  geom_line() +
+  geom_point()
+```
+
+### stacked Area Graph(山形圖，堆疊區域圖)
+```{r}
+aoe = data.frame( 
+nation = rep(c("France", "Huns", "Turkey", "China")), 
+score = c(25, 25, 25, 25, 30, 20, 20, 30, 40, 10, 40, 10, 30, 0, 20, 50), 
+epoch = c(-3000, -3000, -3000, -3000, -1000, -1000, -1000, -1000, 0, 0, 0, 0, 500, 500, 500, 500))
+print(aoe)
+```
+
+### ggplot
+```{r}
+ggplot(aoe, aes(x = epoch, y = score, fill = nation)) + geom_area()
+```
+
