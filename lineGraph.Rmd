@@ -1,6 +1,6 @@
 ```{r}
 #安裝並載入gcookbook 
-install.packages(c("ggplot2", "gcookbook")) 
+#install.packages(c("ggplot2", "gcookbook")) 
 library(ggplot2) 
 library(gcookbook) 
  
@@ -65,6 +65,8 @@ print(aoe)
 
 ### ggplot
 ```{r}
-ggplot(aoe, aes(x = epoch, y = score, fill = nation)) + geom_area()
+ggplot(aoe, aes(x = epoch, y = score, fill = nation)) +
+  geom_area(colour = "black", size = 0.2, alpha = 0.4) +
+  scale_fill_brewer(palette = "Set2", breaks = rev(levels(aoe$nation)))
 ```
 
