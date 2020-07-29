@@ -1,0 +1,66 @@
+### 使用 iris 資料集練習
+
+```{r}
+str(iris)
+```
+
+### 列出欄位
+```{r}
+names(iris)
+```
+
+### 查看大小
+```{r}
+dim(iris)
+```
+
+### 取出特定資料
+```{r}
+#前三筆
+df[1:3,]
+# 第五筆
+df[5,]
+```
+
+
+### 抽樣
+```{r}
+#選定資料集
+df = iris
+
+# 總筆數
+n = nrow(df)
+
+# 亂數種子，確保每次執行抽樣結果相同
+set.seed(4)
+
+# 抽樣 ,seq_len = 產生 1 to n 數列
+t_idx = sample(seq_len(n), size = round(0.8 * n)); t_idx
+
+# train_set
+train_set = df[t_idx,]; nrow(train_set)
+
+# test_set
+test_set = df[-t_idx,]; nrow(test_set)
+```
+
+### 觀察有興趣的欄位
+```{r}
+plot(density(df$Sepal.Length))
+```
+
+
+### 資料 filter
+```{r}
+df_sub = subset(df, Sepal.Length >= 7.5); df_sub
+```
+
+### data frame to json
+```{r}
+library(jsonlite)
+cat(toJSON(df_sub))
+```
+
+
+
+
