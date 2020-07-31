@@ -1,0 +1,87 @@
+### 迴歸分析(Regression)
+
+常見的分類有:
+
+- 簡單線性迴歸 Simple Linear Regression
+- 羅吉斯迴歸  Logistic Regression
+- 複迴歸 Multiple Regression
+
+
+簡單線性迴歸是用來分析一組依變數Y和自變數X的關係:
+
+- 如果依變數Y也是一個數值，就可以是著套線性迴歸。
+- 如果依變數Y是二元型別，這時羅吉斯迴歸分析是很常使用的演算法。
+
+
+自變數:Independent variable
+
+依變數:Dependent variable
+
+簡單迴歸表示式： 
+```Y = a + bX + e```
+
+a是常數
+
+b是相關係數
+
+e是誤差值，希望是服從常態分佈
+
+
+當你覺得X和Y有關係時，就可以用!
+
+今天會使用的是R語言的內建的cars資料集(dataset)，cars數據中有兩個欄位:
+- Speed 速度
+- dist 煞車距離
+
+```{r}
+library(ggplot2)
+# 單位轉換
+cars2 = cars
+cars2$speed = cars2$speed * 1.6094
+cars2$dist = cars2$dist * 0.3048
+
+
+str(cars2)
+g = ggplot(cars2, aes(x = speed, y = dist)) + geom_point(); g
+```
+### 訓練模型
+
+函數就是lm()，方程式(formula)的表示方式就是y~x
+```{r}
+carsLM = lm(formula = dist ~ speed, data = cars2)
+
+#散佈圖 加上模型預測區域 
+g + geom_smooth(method = lm) + labs(x = "speed", y = "dist")
+```
+
+### 方程式係數取得
+```{r}
+# R-squared是簡單評估迴歸模型預測準度的數值，圖中為0.6438，越接近1，解釋力越強大。
+summary(carsLM)
+```
+另外我們回到簡單迴歸表示式：
+```Y = a + bX + e```
+
+可以從模型摘要中取得方程式中的參數
+
+ - 常數a=-5.35811
+
+ - 係數b=0.74475
+
+假設速度 20 公里
+```Y= -5.35811 + 0.74475 * 20 = 9.53689m```
+
+### 利用預測函數取得結果
+```{r}
+newCar = data.frame(speed = 20)
+result = predict(carsLM, newdata = newCar); result
+```
+
+#### 預測結果標註
+```{r}
+g +
+  geom_point(x = newCar$speed, y = result, size = 5, shape = 17, color = "red") +
+  geom_smooth(method = lm) + labs(x = "speed", y = "dist")
+```
+
+

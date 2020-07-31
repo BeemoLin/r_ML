@@ -1,0 +1,174 @@
+### 羅吉斯迴歸分析(Logistic regression)
+
+- 變數Y是二元型別(是/否；有/無)
+- 羅吉斯迴歸分析也是屬於監督式學習(Supervised Learning)
+
+#### 資料集
+- https://www.kaggle.com/mlg-ulb/creditcardfraud/data#
+- 資料集(偽造信用卡)：`creditcard`
+
+```{r}
+CreditCard = read.csv("./CreditCard/creditcard.csv", header=T, sep=",")
+print(class(CreditCard))
+print(names(CreditCard))
+# 觀察
+table(as.factor(CreditCard$Class))
+```
+
+#### 觀察資料集
+```{r}
+df = CreditCard
+df$Class = ifelse(df$Class == 1, 1, 0)
+table(df$Class)
+df_feature = subset(CreditCard, select = c(-Time, -Amount, -Class))
+df_fraud = df[df$Class==1,]
+head(df_fraud)
+names(df_feature)
+```
+
+```{r}
+library(ggplot2)
+
+# 觀察消費金額
+ggplot(df, aes(x = Time, y = Amount, colour = Class)) + 
+  facet_grid(Class ~ .) + 
+  geom_point() +
+  theme_bw()
+```
+#### 觀察特徵 Compute the correlation matrix
+```{r}
+# create matrix
+cormat = round(cor(df), 2)
+
+get_upper_tri = function(cormat){
+    cormat[lower.tri(cormat)] = NA
+    return(cormat)
+}
+
+upper_tri = get_upper_tri(cormat)
+head(upper_tri)
+
+# reshape
+library(reshape2)
+melted_cormat <- melt(cormat)
+
+ggplot(data = melted_cormat, aes(x=Var1, y=Var2, fill=value)) + 
+  geom_tile() +
+  scale_fill_gradient2(low = "blue", high = "red", mid = "white", 
+   midpoint = 0, limit = c(-1,1), space = "Lab", 
+    name="Pearson\nCorrelation")
+```
+### 可能比較重要的特徵
+```{r}
+# 有比較大相關的特徵
+melted_cormat[melted_cormat$Var1 == "Class" & abs(melted_cormat$value) > 0.13,]
+```
+
+
+
+### 切割資料集與預測
+```{r}
+set.seed(22)
+train.index = sample(x=1:nrow(df), size=ceiling(0.8*nrow(df)))
+train = df[train.index,]
+test = df[-train.index,]
+table(train$Class)
+table(test$Class)
+# 羅吉斯模型
+#card_glm = glm(formula = Class ~ ., family = "binomial", data = train)
+#saveRDS(card_glm, file="./model_card_glm.rds")
+card_glm = readRDS("./model_card_glm.rds")
+#str(card_glm)
+#summary(card_glm)
+
+# 預測結果
+result = predict.glm(card_glm, test, type = "response")
+head(result)
+```
+### 建立混淆矩陣(confusion matrix)觀察模型表現
+```{r}
+#r假設我們認定60%以上才視為偽造
+resultTF = ifelse(result > 0.6, 1, 0)
+table(resultTF)
+print(table(test$Class))
+cm = table(test$Class, resultTF, dnn = c("real", "predict"))
+cm
+```
+# 準確率
+```{r}
+print(as.vector(x = cm))
+
+#計算正常卡
+cm[4] / sum(cm[,2])
+
+#計算偽造卡
+cm[1] / sum(cm[,1])
+
+# 整體準確率
+acc = sum(diag(cm)) / sum(cm); acc
+```
+### ROC曲線(receiver operating characteristic curve)
+
+#### 兩個技術名詞TPR(true positive rate)及FPR(false positive rate)。
+
+- TPR = TP/(TP+FN) 被模型說中核准的命中率 (hit rate)。
+
+- FPR = FP/(FP+TN) 被模型預測錯誤的比例，也稱假警報率 (false alarm rate)。
+
+
+#### ROC曲線，曲線主要是由兩個變參數**(1-specificity)及Sensitivity**繪製。
+
+- 1-specificity=FPR，沒有假警報的機率。
+
+- Sensitivity=TPR(True positive rate),被模型說中核准的命中率。
+
+```{r}
+#畫ROC曲線
+library("ROCR")
+pred = prediction(result, test$Class)
+perf = performance(pred, measure = "tpr", x.measure = "fpr")
+
+# 計算 AUC
+auc = performance(pred, "auc");auc
+
+# 畫圖
+plot(perf, main = "ROC curve", xlab = "Specificity(FPR)", ylab = "Sensitivity(TPR)") + 
+  abline(0, 1) +
+  text(0.2, 0.8, as.character(auc@y.values[[1]]))
+```
+
+
+# 測試測試集
+```{r}
+# 處理 ID 變成 integer 的部分
+tab5rows = read.table("./testset.csv", header = TRUE, sep = ",", nrows = 5)
+tab5rows
+# 指定每個欄位的 type
+classes = sapply(tab5rows, class);classes
+# 指定 ID type 為 character
+classes["ID"] = "character";classes
+
+testset = read.csv("./testset.csv", header = T, sep = ",", colClasses = classes)
+testset$ID = as.numeric(testset$ID)
+dim(testset)
+names(testset)
+# 檢查有問題的 ID，錯誤會被縮寫成 2e+05
+testset[1635,]
+# 預測結果
+result = predict.glm(card_glm, testset, type = "response")
+head(result)
+resultTF = ifelse(result > 0.6, 1, 0)
+table(resultTF)
+
+# 綁定結果 ID with result
+ans = cbind(testset$ID, resultTF)
+colnames(ans) = c("ID", "Class")
+head(ans)
+ans = as.data.frame(ans)
+
+write.csv(ans,"ANS.csv", row.names = F)
+```
+
+# 測驗結果
+https://www.kaggle.com/c/1056lab-credit-card-fraud-detection/leaderboard#score
+

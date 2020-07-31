@@ -1,0 +1,10 @@
+name: Publish Document
+title:
+username:
+account: rpubs
+server: rpubs.com
+hostUrl: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/644723/84cf57d7288340a7a438f8426f81a460
+bundleId: https://api.rpubs.com/api/v1/document/644723/84cf57d7288340a7a438f8426f81a460
+url: http://rpubs.com/beemolin/644723
+when: 1596200669.78378

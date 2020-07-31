@@ -1,0 +1,53 @@
+### 地圖(Map)
+```{r}
+#載入maps及ggplot2套件
+library(maps)
+library(ggplot2)
+```
+
+
+```{r}
+#載入世界地圖二維地圖(Latitude緯度,Longitude經度)
+world_map = map_data("world")
+head(world_map, 5)
+```
+
+```{r}
+sort(unique(world_map$region))
+
+#旅行國家
+mycountry = c("Taiwan", "Japan", "China", "North Korea", "South Korea", "India", "Russia", "Mongolia")
+honeymoon = map_data("world", region = mycountry)
+p = ggplot(honeymoon, aes(x = long, y = lat, group = group, fill = region)) + 
+geom_polygon(colour = "gray") + 
+scale_fill_brewer(palette = "Set2")
+p
+```
+### 用城市經緯度來畫點
+ - 首都
+ - 人口 > 100萬人
+```{r}
+#載入世界城市的經緯度(二維地圖)
+data(world.cities)
+
+mycity = subset(world.cities, (world.cities$capital ==1 | world.cities$pop >= 10000000) & world.cities$country.etc %in% mycountry); mycity
+
+mycity$region = mycity$country.etc
+mycity$group = 1
+mycity
+```
+
+### 加上旅行城市的點圖，然後人口越多點越大(size=pop)。
+```{r}
+p + geom_point(aes(x = long, y = lat, size = pop), data = mycity, alpha = 0.7)
+```
+### 加上旅行城市的名稱，位置放在城市點-0.5緯度
+```{r}
+p +
+  geom_point(aes(x = long, y = lat, size = pop), data = mycity, alpha = 0.7) +
+  geom_text(aes(x = long + 15.0, y = lat - 0.5, label = name), data = mycity, colour = "black")
+```
+
+
+
+

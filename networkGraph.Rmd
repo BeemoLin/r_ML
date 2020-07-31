@@ -1,0 +1,43 @@
+### 網路圖(Network Graph)
+
+```{r}
+#載入igraph套件 
+library(igraph)
+```
+```{r}
+#新的航線 
+flightSchedule = data.frame( 
+   from = c("Taipei", "Taichung", "Kaohsiung", "Taidong", "Taidong"), 
+   to   = c("Taichung", "Kaohsiung", "Taidong", "Lyudao", "Taipei")) 
+print(flightSchedule) 
+
+gd = graph.data.frame(flightSchedule); gd
+plot(gd, layout = layout.fruchterman.reingold, vertex.label.family="Helvetica") 
+```
+### 另外一種寫法
+```{r}
+#偶數個數(兩兩成對)
+line = c("Taipei", "Taichung", "Taichung", "Kaohsiung", "Kaohsiung", "Taidong", "Taidong", "Lyudao", "Taidong", "Taipei")
+gd = graph(line)
+plot(gd, layout = layout.fruchterman.reingold)
+
+#一般網路圖 取消方向性 directed
+gu <- graph(line, directed = FALSE)
+plot(gu, layout = layout.fruchterman.reingold)
+```
+### 表現階層關係
+```{r}
+#載入gcookbook
+library(gcookbook)
+madmen
+```
+```{r}
+g = graph.data.frame(madmen, directed = F)
+par(mar = c(0, 0, 0, 0))
+plot(g, layout = layout.circle, vertex.size = 8, vertex.label = NA)
+```
+
+
+
+
+

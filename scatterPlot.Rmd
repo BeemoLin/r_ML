@@ -1,0 +1,39 @@
+### 繪製點 geom_point()
+
+```{r}
+library(ggplot2)
+
+# 克拉越高 價格越高
+ggplot(diamonds, aes(x = carat, y = price)) + geom_point()
+```
+
+```{r}
+# 密度圖(density) 越小顆(0.2-0.4)的才是王道
+ggplot(data = diamonds) + geom_density(aes(x = carat), fill="Gray")
+```
+
+```{r}
+# 完美無瑕(IF)的鑽石，價格相較其他極輕微(VVS)、輕微暇(VS)、微暇(SI)
+#散佈圖(2) 鑽石的淨度 clarity
+ggplot(diamonds, aes(x = carat, y = price, shape = clarity)) + geom_point(aes(color = clarity))
+```
+### 散佈圖矩陣
+```{r}
+# 當出現第四維度的需求，可以考慮用矩陣表示關係
+ggplot(diamonds, aes(x = carat, y = price)) + facet_grid(cut ~ color) + geom_point(aes(color = color))
+```
+### 散佈圖加上密度
+```{r}
+ggplot(iris, aes(x = Petal.Length, y = Petal.Width)) + 
+  geom_point(aes(colour = Species)) +
+  stat_density2d(aes(colour = as.factor(iris$Species)))
+```
+### 點的大小
+```{r}
+# Sepal 萼片/花苞 Petal 花瓣 Species 品種
+qplot(x = Sepal.Length, y = Petal.Length, data = iris, color = Species, size = Petal.Width, alpha = 0.7)
+```
+
+
+
+
